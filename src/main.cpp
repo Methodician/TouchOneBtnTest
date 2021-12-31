@@ -24,30 +24,33 @@
 
 #define DEBOUNCE_TIME  90
 
+uint16_t recentClicks[10];
+uint8_t lastClickEl = 0;
+
 OneButton btnGreen(GREEN_WIRE, true);
 OneButton btnWhite(WHITE_WIRE, true);
 OneButton btnYellow(YELLOW_WIRE, true);
 OneButton btnBlue(BLUE_WIRE, true);
 
-void greenClick() {
-  Serial.println("Green Click");
-}
+void btnClick(uint16_t btnPin) {
+  recentClicks[lastClickEl] = btnPin;
+  if(lastClickEl < 9) {
+    lastClickEl++;
+  } else {
+    lastClickEl = 0;
+  }
 
-void btnClick(int btn) {
-  Serial.print("Button ");
-  Serial.print(btn);
-  Serial.println(" Click");
 }
 
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
-  Serial.println("Starting up");
 
-  btnGreen.attachClick(greenClick);
+  btnGreen.attachClick([]() {
+    btnClick(btnGreen.getPin());
+  });
   btnWhite.attachClick([]() {
-    btnClick(WHITE_WIRE);
+    btnClick(btnWhite.getPin());
   });
 }
 
@@ -55,6 +58,11 @@ void loop() {
   btnGreen.tick();
   btnWhite.tick();
   // Serial.println("Loop");
-  // put your main code here, to run repeatedly:
+  Serial.println();
+  for(uint16_t i = 0; i < 10; i++) {
+    Serial.print(recentClicks[i]);
+    Serial.print("-");
+  }
+  Serial.println();
   delay(10);
 }
