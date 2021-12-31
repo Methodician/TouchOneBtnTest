@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <OneButton.h>
 #include <Adafruit_CircuitPlayground.h>
 
 //  A0 p?
@@ -23,33 +24,37 @@
 
 #define DEBOUNCE_TIME  90
 
-class Btn {
-  public:
-    Btn(
-      const int16_t pin,
-      const bool activeLow,
-      const bool pullupActive
-    ) {
-      _pin = pin;
-      _buttonPressed
-    }
+OneButton btnGreen(GREEN_WIRE, true);
+OneButton btnWhite(WHITE_WIRE, true);
+OneButton btnYellow(YELLOW_WIRE, true);
+OneButton btnBlue(BLUE_WIRE, true);
 
-  private:
-    int16_t _pin;
-    uint16_t _debounceTicks = 50; // ms for debounce time
-    uint16_t _clickTicks = 400;   // ms before click is detected
-    uint16_t _pressTicks = 800;   // ms before long press is detected
-
-
-
-    callbackFunction _clickFunc = NULL;
-
+void greenClick() {
+  Serial.println("Green Click");
 }
+
+void btnClick(int btn) {
+  Serial.print("Button ");
+  Serial.print(btn);
+  Serial.println(" Click");
+}
+
 
 void setup() {
   // put your setup code here, to run once:
+  Serial.begin(9600);
+  Serial.println("Starting up");
+
+  btnGreen.attachClick(greenClick);
+  btnWhite.attachClick([]() {
+    btnClick(WHITE_WIRE);
+  });
 }
 
 void loop() {
+  btnGreen.tick();
+  btnWhite.tick();
+  // Serial.println("Loop");
   // put your main code here, to run repeatedly:
+  delay(10);
 }
